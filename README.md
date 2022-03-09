@@ -37,27 +37,22 @@ Terminology:
   - Then create the `integration` that ties to the resource and HTTP verb of the `method`, hook this up to the lambda.
     - When integrating APIGW with Lambda, you can use either the `AWS` or `AWS_PROXY` integration type. We're going with the latter is simpler to setup (set the integration method's verb to `POST`, map it to the Lambda's invoke-arn, and grant it permissions to use the lambda). The `AWS` integration on the other hand is more involved and requires you to setup the integration request/responses, but it puts less requst-handling logic in the code and does that manipulation within APIGW.
     - The `integration_http_method` is not the same as the regular method that acts on the resource. It's the method that the integration uses to act on the lambda. This needs to be `POST` when working with a lambda-proxy integration.
-  4. Add the custom domain.
-    - For my demo, I'm assuming I already have a domain in GoDaddy and want to do as little work here as possible.
-    - Use `data.aws_route53_zone` to import a manually created public HZ for that domain.
-    - Use the boilerplate code I have for creating a cert and getting it auto-validated using DNS validation.
-    - Then create the custom domain & mapping.
-    - Once created, manually re-deploy the APIGW.
-    - You can now hit the custom domain:
-    `https://test-apigw.kabirg.me/v1`
-    - Workflow: `Request -> HZ -> Alias record (custom domain) -> APIGW`
-
-
-
-Authorization
-- Create an API key
-- Attatch it to a usage plan for that key (required), link that plan to the APIG
-- Link the key to the APIG stage
-- Redeploy the APIG to implement
-- Pass key in header
-  - Passing API key (via header) to APIG once you've enforced API key:
-  `curl -H "x-api-key: plHMkzdfeo6kQn3nzSVpa8APeESMbNyD1XQybbVb" https://1i8g5yhlui.execute-api.us-east-1.amazonaws.com/Test`
-  `curl -X GET -H "x-api-key: plHMkzdfeo6kQn3nzSVpa8APeESMbNyD1XQybbVb" https://1i8g5yhlui.execute-api.us-east-1.amazonaws.com/Test`
+4. Add the custom domain.
+  - For my demo, I'm assuming I already have a domain in GoDaddy and want to do as little work here as possible.
+  - Use `data.aws_route53_zone` to import a manually created public HZ for that domain.
+  - Use the boilerplate code I have for creating a cert and getting it auto-validated using DNS validation.
+  - Then create the custom domain & mapping.
+  - Once created, manually re-deploy the APIGW.
+  - You can now hit the custom domain:
+  `https://test-apigw.kabirg.me/v1`
+  - Workflow: `Request -> HZ -> Alias record (custom domain) -> APIGW`
+5. Require Authorization with an API key
+  - This section of the code create the API key and a usage plan for the API stage.
+  - The mapping resource maps the key to the usage plan. Mapping plans are required for any key that's created.
+  - If nothing is working, ensure to re-deploy the APIGW.
+  - Now you can only hit the API by passing in the API key to the header:
+  `curl -H "x-api-key: rKRqcEoZ1f8nTOsCRNtcB2NH5oRlysMf73xiRBi4" https://test-apigw.kabirg.me/v1`
+  `curl -X GET -H "x-api-key: rKRqcEoZ1f8nTOsCRNtcB2NH5oRlysMf73xiRBi4" https://test-apigw.kabirg.me/v1`
   - You can also choose to use an authorizer rather than a header....
 
 
@@ -88,4 +83,3 @@ Authorization
 - Lambda
   - Integrations: https://medium.com/@lakshmanLD/lambda-proxy-vs-lambda-integration-in-aws-api-gateway-3a9397af0e6d
   - https://www.stackery.io/blog/why-you-should-use-api-gateway-proxy-integration-with-lambda/
-# apigateway_project

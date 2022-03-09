@@ -223,6 +223,33 @@ resource "aws_route53_record" "example" {
 
 
 ######################################################
+######### Authorization #########
+######################################################
+
+# Create an API key
+resource "aws_api_gateway_api_key" "example_key" {
+  name = "kabirg-test-key"
+}
+
+# Create a Usage plan for the key and map it to the stage
+resource "aws_api_gateway_usage_plan" "example_plan" {
+  name = "kabirg_plan"
+
+  api_stages {
+    api_id = aws_api_gateway_rest_api.kabirg-apig-rest-tf.id
+    stage  = aws_api_gateway_stage.example.stage_name
+  }
+}
+
+# Map the key to the plan
+resource "aws_api_gateway_usage_plan_key" "example" {
+  key_id        = aws_api_gateway_api_key.example_key.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.example_plan.id
+}
+
+
+######################################################
 ######### Outputs #########
 ######################################################
 output "base_url" {
@@ -235,4 +262,8 @@ output "invocation_url" {
 
 output "custom_domain" {
   value = "https://${var.subdomain}.${var.domain}"
+}
+
+output "api_key" {
+  value = aws_api_gateway_api_key.example_key.value
 }
