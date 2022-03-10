@@ -92,6 +92,7 @@ resource "aws_api_gateway_method" "example" {
   resource_id   = aws_api_gateway_resource.example.id
   http_method   = "GET"
   authorization = "NONE"
+  api_key_required = true
 }
 
 # Integrating the endpoint with the backend, to handle the request
